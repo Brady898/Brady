@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开心工场</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .setup-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus, input[type="text"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #45a049;
+        }
+        
+        .result-section {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+        
+        .money-counter {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 20px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .time-display {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .coin {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: gold;
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 10;
+            animation: fall 1.5s ease-in;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.8);
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px);
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(500px);
+                opacity: 0;
+            }
+        }
+        
+        .settings-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .advanced-settings {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .checkbox-group {
+            margin: 10px 0;
+        }
+        
+        .checkbox-group label {
+            display: inline;
+            margin-left: 8px;
+        }
+        
+        .reset-btn {
+            background-color: #f44336;
+            margin-top: 15px;
+        }
+        
+        .reset-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .motivational-message {
+            margin-top: 20px;
+            font-style: italic;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>开心工场</h1>
+        
+        <div class="setup-section" id="setupSection">
+            <div class="form-group">
+                <label for="nickname">请输入您的昵称：</label>
+                <input type="text" id="nickname" placeholder="例如：小明" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="monthlySalary">请输入您的月薪（元）：</label>
+                <input type="number" id="monthlySalary" min="1" placeholder="例如：5000">
+            </div>
+            
+            <div class="form-group">
+                <label for="workingDays">每月工作天数：</label>
+                <input type="number" id="workingDays" min="1" max="31" value="22">
+            </div>
+            
+            <div class="form-group">
+                <label for="workingHours">每天工作小时数：</label>
+                <input type="number" id="workingHours" min="1" max="24" value="8">
+            </div>
+            
+            <div class="form-group">
+                <label for="jobPosition">您的职位：</label>
+                <input type="text" id="jobPosition" placeholder="例如：软件工程师" required>
+            </div>
+            
+            <button class="btn" id="startBtn">开始搬砖</button>
+            
+            <div class="settings-toggle" id="settingsToggle">高级设置 ▼</div>
+            
+            <div class="advanced-settings" id="advancedSettings">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeWeekends">
+                    <label for="includeWeekends">计算周末工作时间</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="deductBreaks">
+                    <label for="deductBreaks">扣除午休时间（1小时）</label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="overtimeRate">加班费倍率：</label>
+                    <input type="number" id="overtimeRate" min="1" step="0.1" value="1.5">
+                </div>
+            </div>
+        </div>
+        
+        <div class="result-section" id="resultSection">
+            <div class="time-display">
+                <div id="currentDate">2025年3月27日</div>
+                <div id="currentTime">13:20:00</div>
+            </div>
+            
+            <div class="money-counter" id="moneyCounter">¥0.00</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="hourlyRate">¥0.00</div>
+                    <div class="stat-label">每小时收入</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="minuteRate">¥0.00</div>
+                    <div class="stat-label">每分钟收入</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="secondRate">¥0.00</div>
+                    <div class="stat-label">每秒收入</div>
+                </div>
+            </div>
+            
+            <div class="motivational-message" id="motivationalMessage"></div>
+            
+            <button class="btn reset-btn" id="resetBtn">重新设置</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素
+        const setupSection = document.getElementById('setupSection');
+        const resultSection = document.getElementById('resultSection');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const nickname = document.getElementById('nickname');
+        const monthlySalary = document.getElementById('monthlySalary');
+        const workingDays = document.getElementById('workingDays');
+        const workingHours = document.getElementById('workingHours');
+        const jobPosition = document.getElementById('jobPosition');
+        const moneyCounter = document.getElementById('moneyCounter');
+        const currentDate = document.getElementById('currentDate');
+        const currentTime = document.getElementById('currentTime');
+        const progressBar = document.getElementById('progressBar');
+        const hourlyRate = document.getElementById('hourlyRate');
+        const minuteRate = document.getElementById('minuteRate');
+        const secondRate = document.getElementById('secondRate');
+        const settingsToggle = document.getElementById('settingsToggle');
+        const advancedSettings = document.getElementById('advancedSettings');
+        const includeWeekends = document.getElementById('includeWeekends');
+        const deductBreaks = document.getElementById('deductBreaks');
+        const overtimeRate = document.getElementById('overtimeRate');
+        const motivationalMessage = document.getElementById('motivationalMessage');
+        
+        // 全局变量
+        let salary = 0;
+        let hourlyPay = 0;
+        let minutePay = 0;
+        let secondPay = 0;
+        let totalEarned = 0;
+        let calculationInterval;
+        let animationInterval;
+        let startTime;
+        let isWeekend = false;
+        let isWorkingHours = true;
+        
+        // 动机消息数组
+        const motivationalMessages = [
+            "每一分钱都是你努力的证明！",
+            "加油，为梦想打拼！",
+            "你的价值远不止于此！",
+            "坚持就是胜利，继续加油！",
+            "今天的付出，明天的收获！",
+            "成功的路上不会一帆风顺，但值得坚持！",
+            "每一秒都在为自己的未来努力！",
+            "不经历风雨，怎能见彩虹？",
+            "你比想象中更强大！",
+            "小小的进步，也是前进！"
+        ];
+        
+        // 初始化设置
+        settingsToggle.addEventListener('click', function() {
+            advancedSettings.style.display = advancedSettings.style.display === 'none' || advancedSettings.style.display === '' ? 'block' : 'none';
+            settingsToggle.textContent = advancedSettings.style.display === 'none' ? '高级设置 ▼' : '高级设置 ▲';
+        });
+        
+        // 开始计算
+        startBtn.addEventListener('click', function() {
+            // 获取用户输入
+            const userData = {
+                nickname: nickname.value,
+                monthlySalary: monthlySalary.value,
+                workingDays: workingDays.value,
+                workingHours: workingHours.value,
+                jobPosition: jobPosition.value,
+                includeWeekends: includeWeekends.checked,
+                deductBreaks: deductBreaks.checked,
+                overtimeRate: overtimeRate.value
+            };
+
+            // 读取现有数据
+            fetch('database.json')
+                .then(response => response.json())
+                .then(data => {
+                    // 添加新用户数据
+                    data.users.push(userData);
+                    // 保存更新后的数据
+                    return fetch('saveData.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(data)
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error('保存失败: ' + response.status);
+                        }
+                        return response.json();
+                    });
+                })
+                .catch(error => console.error('Error saving data:', error));
+
+            if (!nickname.value.trim()) {
+                alert('请输入您的昵称！');
+                return;
+            }
+
+            if (!monthlySalary.value || isNaN(monthlySalary.value) || monthlySalary.value <= 0) {
+                alert('请输入有效的月薪！');
+                return;
+            }
+            
+            if (!jobPosition.value.trim()) {
+                alert('请输入您的职位！');
+                return;
+            }
+            
+            // 计算每秒收入
+            const days = parseInt(workingDays.value) || 22;
+            const hours = parseInt(workingHours.value) || 8;
+            salary = parseFloat(monthlySalary.value);
+            
+            hourlyPay = salary / (days * hours);
+            minutePay = hourlyPay / 60;
+            secondPay = minutePay / 60;
+            
+            // 显示收入率
+            hourlyRate.textContent = `¥${hourlyPay.toFixed(2)}`;
+            minuteRate.textContent = `¥${minutePay.toFixed(2)}`;
+            secondRate.textContent = `¥${secondPay.toFixed(4)}`;
+            
+            // 切换界面
+            setupSection.style.display = 'none';
+            resultSection.style.display = 'block';
+            
+            // 设置随机动机消息
+            const randomIndex = Math.floor(Math.random() * motivationalMessages.length);
+            motivationalMessage.textContent = `${nickname.value}，${motivationalMessages[randomIndex]}`;
+            
+            // 开始计时和计算
+            startTime = new Date();
+            updateDateTime();
+            startCalculation();
+            startCoinAnimation();
+        });
+        
+        // 重置计算器
+        resetBtn.addEventListener('click', function() {
+            stopCalculation();
+            setupSection.style.display = 'block';
+            resultSection.style.display = 'none';
+            moneyCounter.textContent = '¥0.00';
+            progressBar.style.width = '0%';
+            totalEarned = 0;
+        });
+        
+        // 更新日期和时间
+        function updateDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            currentDate.textContent = `${year}年${month}月${day}日`;
+            currentTime.textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // 检查是否为周末
+            const dayOfWeek = now.getDay(); // 0是周日，6是周六
+            isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            
+            // 检查是否为工作时间（假设9:00-18:00为工作时间）
+            const currentHour = now.getHours();
+            isWorkingHours = (currentHour >= 9 && currentHour < 18);
+            
+            setTimeout(updateDateTime, 1000);
+        }
+        
+        // 开始计算收入
+        function startCalculation() {
+            calculationInterval = setInterval(function() {
+                // 检查是否应该计算收入
+                let shouldCalculate = true;
+                
+                // 如果不包括周末且当前是周末
+                if (!includeWeekends.checked && isWeekend) {
+                    shouldCalculate = false;
+                }
+                
+                // 如果是工作时间内
+                if (shouldCalculate) {
+                    // 检查是否扣除午休时间
+                    const now = new Date();
+                    const currentHour = now.getHours();
+                    const currentMinute = now.getMinutes();
+                    
+                    // 如果选择扣除午休时间且当前时间是12:00-13:00
+                    if (deductBreaks.checked && currentHour === 12) {
+                        shouldCalculate = false;
+                    }
+                    
+                    // 检查是否应用加班费率
+                    let currentRate = 1;
+                    if (currentHour < 9 || currentHour >= 18) {
+                        currentRate = parseFloat(overtimeRate.value) || 1.5;
+                    }
+                    
+                    if (shouldCalculate) {
+                        // 计算收入
+                        totalEarned += secondPay * currentRate;
+                        moneyCounter.textContent = `¥${totalEarned.toFixed(2)}`;
+                        
+                        // 更新进度条（假设8小时工作日）
+                        const workDay = new Date();
+                        workDay.setHours(9, 0, 0, 0);
+                        const endWorkDay = new Date();
+                        endWorkDay.setHours(17, 0, 0, 0);
+                        
+                        const totalWorkMs = endWorkDay - workDay;
+                        const elapsedMs = now - workDay;
+                        let progress = (elapsedMs / totalWorkMs) * 100;
+                        
+                        // 确保进度在0-100之间
+                        progress = Math.max(0, Math.min(100, progress));
+                        progressBar.style.width = `${progress}%`;
+                    }
+                }
+            }, 1000);
+        }
+        
+        // 停止计算
+        function stopCalculation() {
+            clearInterval(calculationInterval);
+            clearInterval(animationInterval);
+        }
+        
+        // 金币动画
+        function startCoinAnimation() {
+            // 每10秒掉落一堆金币
+            animationInterval = setInterval(function() {
+                // 一次性创建多个金币形成堆积效果
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        createCoin();
+                    }, i * 150); // 每个金币之间有短暂延迟，形成堆积效果
+                }
+            }, 10000);
+        }
+        
+        // 创建金币元素
+        function createCoin() {
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            
+            // 随机位置
+            const left = Math.random() * 100;
+            coin.style.left = `${left}%`;
+            
+            document.querySelector('.container').appendChild(coin);
+            
+            // 动画结束后移除
+            setTimeout(function() {
+                coin.remove();
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
